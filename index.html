@@ -184,3 +184,186 @@ async function bxGet(method, params = {}) {
 
 // ── Main loader: порционная загрузка ─────────────────────────────
 async function startLoad() {
+  if (loading) return;
+  loading = true;
+  allData = [];
+  setStatus('⏳ Загрузка…');
+  setProgress(0);
+  renderPage(1);
+
+  try {
+    // Шаг 1: узнаём сколько всего контактов
+    const first = await bxGet('crm.contact.list', {
+      select: ['ID'], start: 0
+    });
+    const total = parseInt(first.total || 0);
+    const pages = Math.ceil(total / BATCH);
+
+    // Шаг 2: загружаем контакты порциями по 50
+    for (let i = 0; i < pages; i++) {
+      const res = await bxGet('crm.contact.list', {
+        select: ['ID','NAME','LAST_NAME','PHONE','EMAIL','DATE_CREATE'],
+        start: i * BATCH
+      });
+      const contacts = res.result || [];
+
+      // Шаг 3: для этой порции грузим сделки одним запросом
+      const ids = contacts.map(c => c.ID);
+      const dealsRes = await bxGet('crm.deal.list', {
+        select: ['ID','CONTACT_ID','OPPORTUNITY'],
+        'filter[CONTACT_ID]': ids.join('|'),
+        start: 0
+      });
+
+      // Строим индекс сделок
+      const dealIdx = {};
+      for (const d of (dealsRes.result || [])) {
+        const cid = d.CONTACT_ID;
+        if (!dealIdx[cid]) dealIdx[cid] = { count: 0, sum: 0 };
+        dealIdx[cid].count++;
+        dealIdx[cid].sum += parseFloat(d.OPPORTUNITY || 0);
+      }
+
+      // Добавляем контакты у которых есть сделки
+      for (const c of contacts) {
+        if (!dealIdx[c.ID]) continue;
+        allData.push({
+          id:    c.ID,
+          name:  ((c.NAME||'') + ' ' + (c.LAST_NAME||'')).trim(),
+          phone: c.PHONE?.[0]?.VALUE || '',
+          email: c.EMAIL?.[0]?.VALUE || '',
+          date:  (c.DATE_CREATE||'').split('T')[0],
+          deals: dealIdx[c.ID].count,
+          sum:   dealIdx[c.ID].sum,
+        });
+      }
+
+      // Обновляем прогресс и таблицу после каждой порции
+      setProgress(Math.round((i + 1) / pages * 100));
+      setStatus(`⏳ Загружено ${Math.min((i+1)*BATCH, total)} из ${total}`);
+      updateStats();
+      renderPage(1);
+    }
+
+    setStatus('✅ Готово');
+    document.getElementById('stat-loading-card').style.background = '#f0fdf4';
+    document.getElementById('stat-status').style.color = '#15803d';
+
+  } catch(e) {
+    setStatus('❌ Ошибка');
+    document.getElementById('table-body').innerHTML =
+      `<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626">
+        ❌ Ошибка загрузки. Проверьте вебхук.
+      </td></tr>`;
+  }
+  loading = false;
+}
+
+// ── Stats ─────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('stat-total').textContent = fmt(allData.length, 0);
+  document.getElementById('stat-deals').textContent = fmt(allData.reduce((s,r)=>s+r.deals,0), 0);
+  document.getElementById('stat-sum').textContent   = fmt(allData.reduce((s,r)=>s+r.sum,0), 0) + ' ₴';
+}
+
+// ── Filter + Sort + Render ────────────────────────────────────────
+function onSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => renderPage(1), 300);
+}
+
+function getFiltered() {
+  const q     = document.getElementById('search').value.toLowerCase();
+  const dfrom = document.getElementById('date-from').value;
+  const dto   = document.getElementById('date-to').value;
+  const sort  = document.getElementById('sort-select').value;
+
+  let rows = allData.filter(r => {
+    if (q && !r.name.toLowerCase().includes(q) &&
+             !r.phone.includes(q) &&
+             !r.email.toLowerCase().includes(q)) return false;
+    if (dfrom && r.date < dfrom) return false;
+    if (dto   && r.date > dto)   return false;
+    return true;
+  });
+
+  rows.sort((a, b) => {
+    if (sort === 'sum-desc')   return b.sum   - a.sum;
+    if (sort === 'sum-asc')    return a.sum   - b.sum;
+    if (sort === 'deals-desc') return b.deals - a.deals;
+    if (sort === 'name-asc')   return a.name.localeCompare(b.name, 'ru');
+    if (sort === 'date-desc')  return b.date.localeCompare(a.date);
+    return 0;
+  });
+
+  return rows;
+}
+
+function renderPage(p) {
+  const filtered = getFiltered();
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const curPage = Math.min(p, totalPages || 1);
+  const start   = (curPage - 1) * PAGE_SIZE;
+  const rows    = filtered.slice(start, start + PAGE_SIZE);
+  const tbody   = document.getElementById('table-body');
+
+  if (!rows.length && allData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="loading-inline">
+      <div class="spinner"></div>Загрузка данных из Битрикс24…
+    </div></td></tr>`;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#888">
+      🔍 Ничего не найдено
+    </td></tr>`;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr>
+      <td style="color:#aaa">${start + i + 1}</td>
+      <td><strong>${esc(r.name)||'—'}</strong></td>
+      <td>${esc(r.phone)||'—'}</td>
+      <td style="color:#666">${esc(r.email)||'—'}</td>
+      <td style="color:#888">${r.date||'—'}</td>
+      <td><span class="badge badge-blue">${r.deals}</span></td>
+      <td class="sum">${fmt(r.sum)} ₴</td>
+    </tr>`).join('');
+
+  // Пагинация
+  const el = document.getElementById('pagination');
+  if (totalPages <= 1) { el.innerHTML = `<span class="page-info">${filtered.length} записей</span>`; return; }
+
+  let html = `<span class="page-info">${filtered.length} записей</span> `;
+  html += `<button class="page-btn" onclick="renderPage(${curPage-1})" ${curPage===1?'disabled':''}>‹</button>`;
+  for (let pg = 1; pg <= totalPages; pg++) {
+    if (totalPages > 10 && pg > 2 && pg < totalPages-1 && Math.abs(pg-curPage) > 2) {
+      if (pg === 3 || pg === totalPages-2) html += '<span style="padding:0 4px">…</span>';
+      continue;
+    }
+    html += `<button class="page-btn ${pg===curPage?'active':''}" onclick="renderPage(${pg})">${pg}</button>`;
+  }
+  html += `<button class="page-btn" onclick="renderPage(${curPage+1})" ${curPage===totalPages?'disabled':''}>›</button>`;
+  el.innerHTML = html;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function setProgress(pct) {
+  document.getElementById('progress').style.width = pct + '%';
+}
+function setStatus(msg) {
+  document.getElementById('stat-status').textContent = msg;
+}
+function fmt(n, dec = 0) {
+  return Number(n).toLocaleString('ru', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
