@@ -14,100 +14,51 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .header h1 { font-size: 1.3rem; }
-  .btn {
-    padding: 8px 16px; border: none; border-radius: 6px;
-    cursor: pointer; font-size: 0.85rem; font-weight: 600;
-  }
+  .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
   .btn-white { background: white; color: #2563eb; }
   .btn-blue  { background: #2563eb; color: white; }
   .btn-blue:hover { background: #1d4ed8; }
 
-  /* Setup screen */
-  .setup {
-    max-width: 500px; margin: 80px auto; background: white;
-    border-radius: 12px; padding: 40px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  }
+  .setup { max-width: 500px; margin: 80px auto; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
   .setup h2 { margin-bottom: 8px; }
   .setup p  { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
-  .setup input {
-    width: 100%; padding: 10px 14px; border: 1px solid #ddd;
-    border-radius: 8px; font-size: 0.95rem; margin-bottom: 12px;
-  }
+  .setup input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; margin-bottom: 12px; }
   .setup input:focus { outline: none; border-color: #2563eb; }
   .error { color: #dc2626; font-size: 0.85rem; margin-top: 8px; }
 
-  /* Stats bar */
-  .stats-bar {
-    display: flex; gap: 16px; padding: 16px 24px;
-    background: white; border-bottom: 1px solid #e5e7eb;
-    flex-wrap: wrap;
-  }
-  .stat-card {
-    background: #f0f7ff; border-radius: 8px;
-    padding: 12px 20px; min-width: 160px;
-  }
+  .stats-bar { display: flex; gap: 16px; padding: 16px 24px; background: white; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; }
+  .stat-card { background: #f0f7ff; border-radius: 8px; padding: 12px 20px; min-width: 160px; }
   .stat-card .label { font-size: 0.75rem; color: #666; text-transform: uppercase; }
   .stat-card .value { font-size: 1.4rem; font-weight: 700; color: #2563eb; margin-top: 2px; }
 
-  /* Filters */
-  .filters {
-    padding: 14px 24px; background: white;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
-  }
-  .filters input, .filters select {
-    padding: 8px 12px; border: 1px solid #ddd;
-    border-radius: 6px; font-size: 0.88rem;
-  }
-  .filters input:focus, .filters select:focus {
-    outline: none; border-color: #2563eb;
-  }
+  .filters { padding: 14px 24px; background: white; border-bottom: 1px solid #e5e7eb; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .filters input, .filters select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.88rem; }
+  .filters input:focus, .filters select:focus { outline: none; border-color: #2563eb; }
   .filters label { font-size: 0.85rem; color: #555; }
 
-  /* Table */
   .table-wrap { padding: 20px 24px; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; background: white;
-    border-radius: 10px; overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
-  thead th {
-    background: #2563eb; color: white;
-    padding: 12px 16px; text-align: left;
-    font-size: 0.82rem; text-transform: uppercase;
-    letter-spacing: 0.04em; cursor: pointer;
-  }
-  thead th:hover { background: #1d4ed8; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  thead th { background: #2563eb; color: white; padding: 12px 16px; text-align: left; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
   tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
   tbody tr:hover { background: #f0f7ff; }
   tbody td { padding: 11px 16px; font-size: 0.9rem; }
-  .badge {
-    display: inline-block; padding: 2px 10px;
-    border-radius: 20px; font-size: 0.78rem; font-weight: 700;
-  }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
   .badge-blue  { background: #dbeafe; color: #1d4ed8; }
-  .badge-green { background: #d1fae5; color: #065f46; }
   .sum { font-weight: 700; color: #059669; }
 
-  /* Pagination */
-  .pagination {
-    display: flex; justify-content: center; align-items: center;
-    gap: 8px; padding: 16px;
-  }
-  .page-btn {
-    width: 34px; height: 34px; border-radius: 6px;
-    border: 1px solid #ddd; background: white;
-    cursor: pointer; font-size: 0.85rem;
-  }
+  .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 16px; flex-wrap: wrap; }
+  .page-btn { min-width: 34px; height: 34px; padding: 0 8px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 0.85rem; }
   .page-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
   .page-btn:hover:not(.active) { border-color: #2563eb; color: #2563eb; }
 
-  .loading { text-align: center; padding: 60px; color: #888; font-size: 1rem; }
-  .spinner {
-    width: 36px; height: 36px; border: 3px solid #e5e7eb;
-    border-top-color: #2563eb; border-radius: 50%;
-    animation: spin 0.7s linear infinite; margin: 0 auto 12px;
-  }
+  .progress-bar { height: 3px; background: #dbeafe; }
+  .progress-fill { height: 100%; background: #2563eb; transition: width 0.3s; width: 0%; }
+
+  .loading-inline { text-align:center; padding: 40px; color: #888; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  .page-info { color: #888; font-size: 0.85rem; }
 </style>
 </head>
 <body>
@@ -117,26 +68,24 @@
   <div class="setup">
     <h2>🔗 Подключение к Битрикс24</h2>
     <p>Вставьте ссылку вашего входящего вебхука</p>
-    <input type="text" id="webhook-input"
-      placeholder="https://crm.example.com/rest/22/токен/">
-    <button class="btn btn-blue" style="width:100%" onclick="saveWebhook()">
-      Подключиться
-    </button>
+    <input type="text" id="webhook-input" placeholder="https://crm.example.com/rest/22/токен/">
+    <button class="btn btn-blue" style="width:100%" onclick="saveWebhook()">Подключиться</button>
     <div class="error" id="setup-error"></div>
   </div>
 </div>
 
-<!-- Основное приложение -->
+<!-- Приложение -->
 <div id="app" style="display:none">
-
   <div class="header">
     <h1>📊 CRM Статистика — Клиенты</h1>
     <button class="btn btn-white" onclick="logout()">Сменить вебхук</button>
   </div>
 
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
   <div class="stats-bar">
     <div class="stat-card">
-      <div class="label">Клиентов</div>
+      <div class="label">Клиентов со сделками</div>
       <div class="value" id="stat-total">—</div>
     </div>
     <div class="stat-card">
@@ -147,69 +96,61 @@
       <div class="label">Общая сумма</div>
       <div class="value" id="stat-sum">—</div>
     </div>
+    <div class="stat-card" id="stat-loading-card" style="background:#fff8e1">
+      <div class="label">Статус</div>
+      <div class="value" id="stat-status" style="font-size:0.95rem;color:#b45309">⏳ Загрузка…</div>
+    </div>
   </div>
 
   <div class="filters">
     <label>Поиск:</label>
-    <input type="search" id="search" placeholder="Имя, email, телефон…"
-      oninput="filterAndRender()">
-
-    <label>Дата создания с:</label>
-    <input type="date" id="date-from" onchange="filterAndRender()">
-
+    <input type="search" id="search" placeholder="Имя, email, телефон…" oninput="onSearch()">
+    <label>Дата с:</label>
+    <input type="date" id="date-from" onchange="renderPage(1)">
     <label>по:</label>
-    <input type="date" id="date-to" onchange="filterAndRender()">
-
+    <input type="date" id="date-to" onchange="renderPage(1)">
     <label>Сортировка:</label>
-    <select id="sort-select" onchange="sortAndRender()">
+    <select id="sort-select" onchange="renderPage(1)">
       <option value="sum-desc">Сумма ↓</option>
       <option value="sum-asc">Сумма ↑</option>
       <option value="deals-desc">Сделок ↓</option>
       <option value="name-asc">Имя А→Я</option>
       <option value="date-desc">Дата ↓</option>
     </select>
-
-    <button class="btn btn-blue" onclick="loadAll()">🔄 Обновить</button>
+    <button class="btn btn-blue" onclick="startLoad()">🔄 Обновить</button>
   </div>
 
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Имя</th>
-          <th>Телефон</th>
-          <th>Email</th>
-          <th>Дата создания</th>
-          <th>Сделок</th>
-          <th>Сумма (₴)</th>
+          <th>#</th><th>Имя</th><th>Телефон</th>
+          <th>Email</th><th>Дата создания</th>
+          <th>Сделок</th><th>Сумма (₴)</th>
         </tr>
       </thead>
       <tbody id="table-body">
-        <tr><td colspan="7">
-          <div class="loading">
-            <div class="spinner"></div>
-            Загрузка данных…
-          </div>
-        </td></tr>
+        <tr><td colspan="7"><div class="loading-inline">
+          <div class="spinner"></div>Подготовка…
+        </div></td></tr>
       </tbody>
     </table>
   </div>
-
   <div class="pagination" id="pagination"></div>
 </div>
 
 <script>
-let WEBHOOK   = '';
-let allData   = [];   // все контакты с данными сделок
-let filtered  = [];   // после фильтров
-let page      = 1;
-const PER_PAGE = 50;
+let WEBHOOK = '';
+let allData = [];        // накапливается по мере загрузки
+let loading = false;
+let searchTimer = null;
+const PAGE_SIZE = 50;    // строк на странице
+const BATCH = 50;        // контактов за один запрос (лимит Битрикс)
 
 // ── Init ──────────────────────────────────────────────────────────
 window.onload = () => {
   const saved = localStorage.getItem('bx_webhook');
-  if (saved) { WEBHOOK = saved; showApp(); loadAll(); }
+  if (saved) { WEBHOOK = saved; showApp(); startLoad(); }
 };
 
 function saveWebhook() {
@@ -221,7 +162,7 @@ function saveWebhook() {
   WEBHOOK = val.endsWith('/') ? val : val + '/';
   localStorage.setItem('bx_webhook', WEBHOOK);
   showApp();
-  loadAll();
+  startLoad();
 }
 
 function showApp() {
@@ -234,186 +175,12 @@ function logout() {
   location.reload();
 }
 
-// ── API helpers ───────────────────────────────────────────────────
-async function bxCall(method, params = {}) {
-  const qs = new URLSearchParams(params).toString();
+// ── Fetch helpers ─────────────────────────────────────────────────
+async function bxGet(method, params = {}) {
+  const qs  = new URLSearchParams(params).toString();
   const res = await fetch(`${WEBHOOK}${method}.json?${qs}`);
-  const data = await res.json();
-  return data.result ?? [];
+  return await res.json();
 }
 
-async function bxFetchAll(method, params = {}) {
-  let all = [], start = 0;
-  while (true) {
-    const res = await fetch(
-      `${WEBHOOK}${method}.json?` + new URLSearchParams({...params, start})
-    );
-    const data = await res.json();
-    const items = data.result ?? [];
-    all = all.concat(items);
-    if (items.length < 50) break;
-    start += 50;
-  }
-  return all;
-}
-
-// ── Load all data ─────────────────────────────────────────────────
-async function loadAll() {
-  setLoading();
-  try {
-    // 1. Все контакты
-    const contacts = await bxFetchAll('crm.contact.list', {
-      select: ['ID','NAME','LAST_NAME','PHONE','EMAIL','DATE_CREATE']
-    });
-
-    // 2. Все сделки
-    const deals = await bxFetchAll('crm.deal.list', {
-      select: ['ID','CONTACT_ID','OPPORTUNITY','CURRENCY_ID']
-    });
-
-    // 3. Индекс сделок по контакту
-    const dealIndex = {};
-    for (const d of deals) {
-      const cid = d.CONTACT_ID;
-      if (!cid) continue;
-      if (!dealIndex[cid]) dealIndex[cid] = { count: 0, sum: 0 };
-      dealIndex[cid].count++;
-      dealIndex[cid].sum += parseFloat(d.OPPORTUNITY || 0);
-    }
-
-    // 4. Собираем — только контакты у которых есть сделки
-    allData = contacts
-      .filter(c => dealIndex[c.ID])
-      .map(c => ({
-        id:      c.ID,
-        name:    ((c.NAME || '') + ' ' + (c.LAST_NAME || '')).trim(),
-        phone:   c.PHONE?.[0]?.VALUE || '',
-        email:   c.EMAIL?.[0]?.VALUE || '',
-        date:    c.DATE_CREATE?.split('T')[0] || '',
-        deals:   dealIndex[c.ID].count,
-        sum:     dealIndex[c.ID].sum,
-      }));
-
-    filterAndRender();
-    updateStats();
-
-  } catch(e) {
-    document.getElementById('table-body').innerHTML =
-      `<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626">
-        ❌ Ошибка загрузки. Проверьте вебхук.
-      </td></tr>`;
-  }
-}
-
-// ── Stats ─────────────────────────────────────────────────────────
-function updateStats() {
-  const totalDeals = allData.reduce((s, r) => s + r.deals, 0);
-  const totalSum   = allData.reduce((s, r) => s + r.sum,   0);
-  document.getElementById('stat-total').textContent = fmt(allData.length, 0);
-  document.getElementById('stat-deals').textContent = fmt(totalDeals, 0);
-  document.getElementById('stat-sum').textContent   = fmt(totalSum, 0) + ' ₴';
-}
-
-// ── Filter ────────────────────────────────────────────────────────
-function filterAndRender() {
-  const q      = document.getElementById('search').value.toLowerCase();
-  const dfrom  = document.getElementById('date-from').value;
-  const dto    = document.getElementById('date-to').value;
-
-  filtered = allData.filter(r => {
-    if (q && !r.name.toLowerCase().includes(q) &&
-             !r.phone.includes(q) &&
-             !r.email.toLowerCase().includes(q)) return false;
-    if (dfrom && r.date < dfrom) return false;
-    if (dto   && r.date > dto)   return false;
-    return true;
-  });
-
-  sortRows();
-  page = 1;
-  render();
-}
-
-function sortAndRender() { sortRows(); render(); }
-
-function sortRows() {
-  const val = document.getElementById('sort-select').value;
-  filtered.sort((a, b) => {
-    if (val === 'sum-desc')   return b.sum   - a.sum;
-    if (val === 'sum-asc')    return a.sum   - b.sum;
-    if (val === 'deals-desc') return b.deals - a.deals;
-    if (val === 'name-asc')   return a.name.localeCompare(b.name);
-    if (val === 'date-desc')  return b.date.localeCompare(a.date);
-    return 0;
-  });
-}
-
-// ── Render ────────────────────────────────────────────────────────
-function render() {
-  const start = (page - 1) * PER_PAGE;
-  const rows  = filtered.slice(start, start + PER_PAGE);
-  const tbody = document.getElementById('table-body');
-
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#888">
-      🔍 Ничего не найдено
-    </td></tr>`;
-    document.getElementById('pagination').innerHTML = '';
-    return;
-  }
-
-  let html = '';
-  rows.forEach((r, i) => {
-    html += `<tr>
-      <td style="color:#aaa">${start + i + 1}</td>
-      <td><strong>${esc(r.name) || '—'}</strong></td>
-      <td>${esc(r.phone) || '—'}</td>
-      <td style="color:#666">${esc(r.email) || '—'}</td>
-      <td style="color:#888">${r.date || '—'}</td>
-      <td><span class="badge badge-blue">${r.deals}</span></td>
-      <td class="sum">${fmt(r.sum)} ₴</td>
-    </tr>`;
-  });
-  tbody.innerHTML = html;
-  renderPagination();
-}
-
-function renderPagination() {
-  const total = Math.ceil(filtered.length / PER_PAGE);
-  const el    = document.getElementById('pagination');
-  if (total <= 1) { el.innerHTML = ''; return; }
-
-  let html = '';
-  for (let p = 1; p <= total; p++) {
-    if (total > 10 && p > 3 && p < total - 2 && Math.abs(p - page) > 2) {
-      if (p === 4 || p === total - 3) html += '<span>…</span>';
-      continue;
-    }
-    html += `<button class="page-btn ${p===page?'active':''}"
-      onclick="goPage(${p})">${p}</button>`;
-  }
-  el.innerHTML = `<span style="color:#888;font-size:.85rem">${filtered.length} записей</span> ${html}`;
-}
-
-function goPage(p) { page = p; render(); window.scrollTo(0,0); }
-
-// ── Helpers ───────────────────────────────────────────────────────
-function setLoading() {
-  document.getElementById('table-body').innerHTML =
-    `<tr><td colspan="7"><div class="loading">
-      <div class="spinner"></div>Загрузка данных из Битрикс24…
-    </div></td></tr>`;
-}
-
-function fmt(n, dec = 0) {
-  return Number(n).toLocaleString('ru', {
-    minimumFractionDigits: dec, maximumFractionDigits: dec
-  });
-}
-
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-</script>
-</body>
-</html>
+// ── Main loader: порционная загрузка ─────────────────────────────
+async function startLoad() {
