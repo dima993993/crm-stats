@@ -225,18 +225,18 @@ async function startLoad() {
       }
 
       // Добавляем контакты у которых есть сделки
-      for (const c of contacts) {
-        if (!dealIdx[c.ID]) continue;
-        allData.push({
-          id:    c.ID,
-          name:  ((c.NAME||'') + ' ' + (c.LAST_NAME||'')).trim(),
-          phone: c.PHONE?.[0]?.VALUE || '',
-          email: c.EMAIL?.[0]?.VALUE || '',
-          date:  (c.DATE_CREATE||'').split('T')[0],
-          deals: dealIdx[c.ID].count,
-          sum:   dealIdx[c.ID].sum,
-        });
-      }
+      // for (const c of contacts) {
+      //   if (!dealIdx[c.ID]) continue;
+      //   allData.push({
+      //     id:    c.ID,
+      //     name:  ((c.NAME||'') + ' ' + (c.LAST_NAME||'')).trim(),
+      //     phone: c.PHONE?.[0]?.VALUE || '',
+      //     email: c.EMAIL?.[0]?.VALUE || '',
+      //     date:  (c.DATE_CREATE||'').split('T')[0],
+      //     deals: dealIdx[c.ID].count,
+      //     sum:   dealIdx[c.ID].sum,
+      //   });
+      // }
 
       // Обновляем прогресс и таблицу после каждой порции
       setProgress(Math.round((i + 1) / pages * 100));
