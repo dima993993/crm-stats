@@ -141,13 +141,12 @@
 
 <script>
 let WEBHOOK = '';
-let allData = [];        // накапливается по мере загрузки
+let allData = [];
 let loading = false;
 let searchTimer = null;
-const PAGE_SIZE = 50;    // строк на странице
-const BATCH = 50;        // контактов за один запрос (лимит Битрикс)
+const PAGE_SIZE = 50;
+const BATCH = 50;
 
-// ── Init ──────────────────────────────────────────────────────────
 window.onload = () => {
   const saved = localStorage.getItem('bx_webhook');
   if (saved) { WEBHOOK = saved; showApp(); startLoad(); }
@@ -175,14 +174,15 @@ function logout() {
   location.reload();
 }
 
-// ── Fetch helpers ─────────────────────────────────────────────────
-async function bxGet(method, params = {}) {
-  const qs  = new URLSearchParams(params).toString();
-  const res = await fetch(`${WEBHOOK}${method}.json?${qs}`);
+async function bxPost(method, params = {}) {
+  const res = await fetch(`${WEBHOOK}${method}.json`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params)
+  });
   return await res.json();
 }
 
-// ── Main loader: порционная загрузка ─────────────────────────────
 async function startLoad() {
   if (loading) return;
   loading = true;
@@ -193,54 +193,61 @@ async function startLoad() {
 
   try {
     // Шаг 1: узнаём сколько всего контактов
-    const first = await bxGet('crm.contact.list', {
-      select: ['ID'], start: 0
+    const first = await bxPost('crm.contact.list', {
+      select: ['ID'],
+      start: 0
     });
     const total = parseInt(first.total || 0);
     const pages = Math.ceil(total / BATCH);
 
-    // Шаг 2: загружаем контакты порциями по 50
+    // Шаг 2: загружаем ВСЕ сделки сразу порциями
+    // (это быстрее чем фильтровать по каждому контакту)
+    setStatus('⏳ Загружаем сделки…');
+    const dealIndex = {};
+
+    let dealStart = 0;
+    while (true) {
+      const dr = await bxPost('crm.deal.list', {
+        select: ['ID', 'CONTACT_ID', 'OPPORTUNITY'],
+        start: dealStart
+      });
+      const deals = dr.result || [];
+      for (const d of deals) {
+        const cid = d.CONTACT_ID;
+        if (!cid) continue;
+        if (!dealIndex[cid]) dealIndex[cid] = { count: 0, sum: 0 };
+        dealIndex[cid].count++;
+        dealIndex[cid].sum += parseFloat(d.OPPORTUNITY || 0);
+      }
+      if (deals.length < 50) break;
+      dealStart += 50;
+    }
+
+    setStatus('⏳ Загружаем контакты…');
+
+    // Шаг 3: загружаем контакты порциями
     for (let i = 0; i < pages; i++) {
-      const res = await bxGet('crm.contact.list', {
+      const res = await bxPost('crm.contact.list', {
         select: ['ID','NAME','LAST_NAME','PHONE','EMAIL','DATE_CREATE'],
         start: i * BATCH
       });
       const contacts = res.result || [];
 
-      // Шаг 3: для этой порции грузим сделки одним запросом
-      const ids = contacts.map(c => c.ID);
-      const dealsRes = await bxGet('crm.deal.list', {
-        select: ['ID','CONTACT_ID','OPPORTUNITY'],
-        'filter[CONTACT_ID]': ids.join('|'),
-        start: 0
-      });
-
-      // Строим индекс сделок
-      const dealIdx = {};
-      for (const d of (dealsRes.result || [])) {
-        const cid = d.CONTACT_ID;
-        if (!dealIdx[cid]) dealIdx[cid] = { count: 0, sum: 0 };
-        dealIdx[cid].count++;
-        dealIdx[cid].sum += parseFloat(d.OPPORTUNITY || 0);
-      }
-
-      // Добавляем контакты у которых есть сделки
       for (const c of contacts) {
-        if (!dealIdx[c.ID]) continue;
+        if (!dealIndex[c.ID]) continue; // нет сделок — пропускаем
         allData.push({
           id:    c.ID,
           name:  ((c.NAME||'') + ' ' + (c.LAST_NAME||'')).trim(),
-          phone: c.PHONE?.[0]?.VALUE || '',
-          email: c.EMAIL?.[0]?.VALUE || '',
+          phone: Array.isArray(c.PHONE) ? (c.PHONE[0]?.VALUE || '') : '',
+          email: Array.isArray(c.EMAIL) ? (c.EMAIL[0]?.VALUE || '') : '',
           date:  (c.DATE_CREATE||'').split('T')[0],
-          deals: dealIdx[c.ID].count,
-          sum:   dealIdx[c.ID].sum,
+          deals: dealIndex[c.ID].count,
+          sum:   dealIndex[c.ID].sum,
         });
       }
 
-      // Обновляем прогресс и таблицу после каждой порции
       setProgress(Math.round((i + 1) / pages * 100));
-      setStatus(`⏳ Загружено ${Math.min((i+1)*BATCH, total)} из ${total}`);
+      setStatus(`⏳ Контакты: ${Math.min((i+1)*BATCH, total)} из ${total}`);
       updateStats();
       renderPage(1);
     }
@@ -259,14 +266,12 @@ async function startLoad() {
   loading = false;
 }
 
-// ── Stats ─────────────────────────────────────────────────────────
 function updateStats() {
   document.getElementById('stat-total').textContent = fmt(allData.length, 0);
   document.getElementById('stat-deals').textContent = fmt(allData.reduce((s,r)=>s+r.deals,0), 0);
   document.getElementById('stat-sum').textContent   = fmt(allData.reduce((s,r)=>s+r.sum,0), 0) + ' ₴';
 }
 
-// ── Filter + Sort + Render ────────────────────────────────────────
 function onSearch() {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => renderPage(1), 300);
@@ -300,12 +305,12 @@ function getFiltered() {
 }
 
 function renderPage(p) {
-  const filtered = getFiltered();
+  const filtered   = getFiltered();
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const curPage = Math.min(p, totalPages || 1);
-  const start   = (curPage - 1) * PAGE_SIZE;
-  const rows    = filtered.slice(start, start + PAGE_SIZE);
-  const tbody   = document.getElementById('table-body');
+  const curPage    = Math.min(p, totalPages || 1);
+  const start      = (curPage - 1) * PAGE_SIZE;
+  const rows       = filtered.slice(start, start + PAGE_SIZE);
+  const tbody      = document.getElementById('table-body');
 
   if (!rows.length && allData.length === 0) {
     tbody.innerHTML = `<tr><td colspan="7"><div class="loading-inline">
@@ -334,9 +339,11 @@ function renderPage(p) {
       <td class="sum">${fmt(r.sum)} ₴</td>
     </tr>`).join('');
 
-  // Пагинация
   const el = document.getElementById('pagination');
-  if (totalPages <= 1) { el.innerHTML = `<span class="page-info">${filtered.length} записей</span>`; return; }
+  if (totalPages <= 1) {
+    el.innerHTML = `<span class="page-info">${filtered.length} записей</span>`;
+    return;
+  }
 
   let html = `<span class="page-info">${filtered.length} записей</span> `;
   html += `<button class="page-btn" onclick="renderPage(${curPage-1})" ${curPage===1?'disabled':''}>‹</button>`;
@@ -351,7 +358,6 @@ function renderPage(p) {
   el.innerHTML = html;
 }
 
-// ── Helpers ───────────────────────────────────────────────────────
 function setProgress(pct) {
   document.getElementById('progress').style.width = pct + '%';
 }
